@@ -1,0 +1,55 @@
+name: Build iOS (Sideloading)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: 🏗 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🍏 Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: 🚀 Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🛠️ Generate Native Folders (Prebuild)
+        run: npx expo prebuild --platform ios
+
+      - name: 🏗️ Build App (Xcode)
+        run: |
+          cd ios
+          xcodebuild -workspace *.xcworkspace \
+            -scheme VIZU \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGN_ING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGNING_IDENTITY="" \
+            clean build
+
+      - name: 📦 Package as .IPA (Sideloading Workaround)
+        run: |
+          mkdir -p build/Payload
+          mv ios/build/Release-iphoneos/VIZU.app build/Payload/
+          cd build
+          zip -r vizu-unsigned.ipa Payload
+
+      - name: 📤 Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-unsigned-ipa
+          path: build/vizu-unsigned.ipa
