@@ -25,26 +25,32 @@ jobs:
         run: npm install
 
       - name: 🛠️ Generate Native Folders (Prebuild)
-        run: npx expo prebuild --platform ios
+        run: npx expo prebuild --platform ios --clean
 
       - name: 🏗️ Build App (Xcode)
         run: |
           cd ios
-          xcodebuild -workspace *.xcworkspace \
+          xcodebuild \
+            -workspace *.xcworkspace \
             -scheme VIZU \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
+            -derivedDataPath derived_data \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGNING_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             clean build
 
       - name: 📦 Package as .IPA (Sideloading Workaround)
         run: |
+          APP_PATH=$(find ios/derived_data -name "*.app" -not -path "*/PlugIns/*" | head -1)
+          echo "Found .app at: $APP_PATH"
           mkdir -p build/Payload
-          mv ios/build/Release-iphoneos/VIZU.app build/Payload/
+          cp -r "$APP_PATH" build/Payload/
           cd build
           zip -r vizu-unsigned.ipa Payload
 
