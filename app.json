@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "VIZU",
+    "slug": "VIZU",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jxnatan7.VIZU",
+      "infoPlist": {
+        "NSCameraUsageDescription": "O VIZU precisa de acesso à câmera para reconhecer textos em tempo real."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.jxnatan7.VIZU",
+      "permissions": ["android.permission.CAMERA"]
+    },
+    "plugins": [
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "O VIZU precisa de acesso à câmera para reconhecer textos em tempo real."
+        }
+      ]
+    ],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
