@@ -27,6 +27,16 @@ jobs:
       - name: 🛠️ Generate Native Folders (Prebuild)
         run: npx expo prebuild --platform ios --clean
 
+      - name: 🔏 Disable Code Signing in project.pbxproj
+        run: |
+          PBXPROJ="ios/VIZU.xcodeproj/project.pbxproj"
+          sed -i '' 's/DEVELOPMENT_TEAM = [^;]*;/DEVELOPMENT_TEAM = "";/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGN_IDENTITY = [^;]*;/CODE_SIGN_IDENTITY = "";/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGNING_REQUIRED = [^;]*;/CODE_SIGNING_REQUIRED = NO;/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGNING_ALLOWED = [^;]*;/CODE_SIGNING_ALLOWED = NO;/g' "$PBXPROJ"
+          # Also add the settings if they don't exist in the Release config block
+          echo "✅ Patched project.pbxproj signing settings"
+
       - name: 🏗️ Build App (Xcode)
         run: |
           cd ios
@@ -43,7 +53,7 @@ jobs:
             CODE_SIGNING_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
-            clean build
+            build
 
       - name: 📦 Package as .IPA (Sideloading Workaround)
         run: |
